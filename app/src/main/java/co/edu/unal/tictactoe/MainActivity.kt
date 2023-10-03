@@ -4,11 +4,17 @@ import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
 
 class MainActivity : AppCompatActivity() {
+
+    companion object {
+        const val DIALOG_DIFFICULTY_ID = 0
+        const val DIALOG_QUIT_ID = 1
+    }
 
     private var mGameOver = false
     private val mGame = TicTacToeGame()
@@ -39,14 +45,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        super.onCreateOptionsMenu(menu)
-        menu.add("New Game")
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.options_menu, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        startNewGame()
-        return true
+        return when(item.itemId) {
+            R.id.new_game -> {
+                startNewGame()
+                 true
+            }
+            R.id.ai_difficulty -> {
+                showDialog(DIALOG_DIFFICULTY_ID)
+                true
+            }
+            R.id.quit -> {
+                showDialog(DIALOG_QUIT_ID)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun startNewGame() {
@@ -96,4 +115,3 @@ class MainActivity : AppCompatActivity() {
             this.mBoardButtons[location].setTextColor(Color.rgb(200, 0, 0))
     }
 }
-

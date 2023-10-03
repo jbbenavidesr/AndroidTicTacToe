@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/new_game"
+        android:title="New Game"
+        android:icon="@drawable/restart" />
+    <item android:id="@+id/ai_difficulty"
+        android:title="Difficulty"
+        android:icon="@drawable/levels" />
+    <item android:id="@+id/quit"
+        android:title="Quit"
+        android:icon="@drawable/quit" />
+</menu>
