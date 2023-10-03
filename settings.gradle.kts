@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "AndroidTicTacToe-Tutorial2"
+rootProject.name = "TicTacToe"
 include(":app")

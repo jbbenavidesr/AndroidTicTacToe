@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity() {
                     var winner = this.mGame.checkForWinner()
                     if (winner == 0) {
                         mInfoTextView.text = getString(R.string.turn_computer)
-                        var move = this.mGame.getComputerMove()
+                        var move = this.mGame.computerMove
                         this.setMove(TicTacToeGame.COMPUTER_PLAYER, move)
                         winner = this.mGame.checkForWinner()
                     }

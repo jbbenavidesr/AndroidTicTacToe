@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class TicTacToeGame {
 
-    private char mBoard[] = { OPEN_SPOT, OPEN_SPOT, OPEN_SPOT, OPEN_SPOT, OPEN_SPOT, OPEN_SPOT, OPEN_SPOT, OPEN_SPOT, OPEN_SPOT  };
+    private final char[] mBoard = { OPEN_SPOT, OPEN_SPOT, OPEN_SPOT, OPEN_SPOT, OPEN_SPOT, OPEN_SPOT, OPEN_SPOT, OPEN_SPOT, OPEN_SPOT  };
 
     private final int BOARD_SIZE = 9;
 
@@ -13,7 +13,7 @@ public class TicTacToeGame {
     public static final char COMPUTER_PLAYER = 'O';
     public static final char OPEN_SPOT = ' ';
 
-    private Random mRand;
+    private final Random mRand;
 
     public TicTacToeGame() {
 
