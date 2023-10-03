@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity() {
                     var winner = this.mGame.checkForWinner()
                     if (winner == 0) {
                         mInfoTextView.text = getString(R.string.turn_computer)
-                        var move = this.mGame.computerMove
+                        var move = this.mGame.getComputerMove()
                         this.setMove(TicTacToeGame.COMPUTER_PLAYER, move)
                         winner = this.mGame.checkForWinner()
                     }
@@ -73,6 +73,7 @@ class MainActivity : AppCompatActivity() {
                             mInfoTextView.text = getString(R.string.turn_human)
                             this.mGameOver = false
                         }
+
                         1 -> mInfoTextView.text = getString(R.string.result_tie)
                         2 -> mInfoTextView.text = getString(R.string.result_human_wins)
                         else -> mInfoTextView.text = getString(R.string.result_computer_wins)
