@@ -11,6 +11,12 @@ class TicTacToeGame {
         const val OPEN_SPOT = ' '
     }
 
+    public enum class DifficultyLevel {
+        Easy, Hard, Expert
+    }
+
+    var mDfficultyLevel = DifficultyLevel.Expert
+
     private val mBoard = Array<Char>(9) { OPEN_SPOT }
 
     /** Clear the board of all X's and O's by setting all spots to OPEN_SPOT. */
@@ -108,9 +114,32 @@ class TicTacToeGame {
      * @return The best move for the computer to make (0-8).
      */
     public fun getComputerMove() : Int {
-        var move : Int
+        var move = -1
 
-        // First see if there's a move to win
+        when (this.mDfficultyLevel) {
+            DifficultyLevel.Easy -> move = getRandomMove()
+            DifficultyLevel.Hard -> {
+                move = getWinningMove()
+                if (move == -1) {
+                    move = getRandomMove()
+                }
+            }
+            DifficultyLevel.Expert -> {
+                move = getWinningMove()
+                if (move == -1) {
+                    move = getBlockingMove()
+                }
+                if (move == -1) {
+                    move = getRandomMove()
+                }
+            }
+        }
+
+        return move
+    }
+
+    private fun getWinningMove(): Int {
+
         for (i in 0 until BOARD_SIZE) {
             if (mBoard[i] != HUMAN_PLAYER && mBoard[i] != COMPUTER_PLAYER) {
                 var current = mBoard[i]
@@ -123,7 +152,10 @@ class TicTacToeGame {
             }
         }
 
-        // See if there's a move to block opponent from winning
+        return -1
+    }
+
+    private fun getBlockingMove(): Int {
         for (i in 0 until BOARD_SIZE) {
             if (mBoard[i] != HUMAN_PLAYER && mBoard[i] != COMPUTER_PLAYER) {
                 var current = mBoard[i]
@@ -136,6 +168,11 @@ class TicTacToeGame {
                 }
             }
         }
+        return -1
+    }
+
+    private fun getRandomMove() : Int {
+        var move = -1
 
         // Generate random move
         do {
