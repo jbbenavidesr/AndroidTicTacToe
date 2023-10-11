@@ -9,13 +9,17 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import android.view.MotionEvent
+import android.view.View
+import android.view.View.OnTouchListener
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.DialogFragment
 
 class MainActivity : AppCompatActivity(),
-    SelectDifficultyDialogFragment.SelectDifficultyDialogListener {
+    SelectDifficultyDialogFragment.SelectDifficultyDialogListener,
+    OnTouchListener {
 
     private var mGameOver = false
     private val mGame = TicTacToeGame()
@@ -23,6 +27,7 @@ class MainActivity : AppCompatActivity(),
     private lateinit var mInfoTextView: TextView
     private lateinit var mDifficultyTextView: TextView
     private lateinit var mToolbar: Toolbar
+    private lateinit var mBoardView: BoardView
 
     private var mSelectDifficultyDialog = SelectDifficultyDialogFragment()
 
@@ -32,17 +37,9 @@ class MainActivity : AppCompatActivity(),
 
         this.mGame.clearBoard()
 
-        this.mBoardButtons = listOf<Button>(
-            findViewById<Button>(R.id.one),
-            findViewById<Button>(R.id.two),
-            findViewById<Button>(R.id.three),
-            findViewById<Button>(R.id.four),
-            findViewById<Button>(R.id.five),
-            findViewById<Button>(R.id.six),
-            findViewById<Button>(R.id.seven),
-            findViewById<Button>(R.id.eight),
-            findViewById<Button>(R.id.nine),
-        )
+        this.mBoardView = findViewById<BoardView>(R.id.board)
+        this.mBoardView.mGame = mGame
+        this.mBoardView.setOnTouchListener(this)
 
         this.mInfoTextView = findViewById<TextView>(R.id.information)
         this.mDifficultyTextView = findViewById<TextView>(R.id.tv_difficulty)
@@ -59,15 +56,17 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when(item.itemId) {
+        return when (item.itemId) {
             R.id.new_game -> {
                 mSelectDifficultyDialog.show(supportFragmentManager, "difficulty_select")
                 true
             }
+
             R.id.quit -> {
                 finish()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -75,52 +74,18 @@ class MainActivity : AppCompatActivity(),
     private fun startNewGame() {
         this.mGame.clearBoard()
         this.mGameOver = false
-
-        for ((i, button) in this.mBoardButtons.withIndex()) {
-            button.text = ""
-            button.isEnabled = true
-            button.setOnClickListener {
-                if (button.isEnabled and !this.mGameOver) {
-                    this.setMove(TicTacToeGame.HUMAN_PLAYER, i)
-                    this.mGameOver = true
-                    var winner = this.mGame.checkForWinner()
-                    if (winner == 0) {
-                        mInfoTextView.text = getString(R.string.turn_computer)
-                        var move = this.mGame.getComputerMove()
-                        this.setMove(TicTacToeGame.COMPUTER_PLAYER, move)
-                        winner = this.mGame.checkForWinner()
-                    }
-
-                    when (winner) {
-                        0 -> {
-                            mInfoTextView.text = getString(R.string.turn_human)
-                            this.mGameOver = false
-                        }
-
-                        1 -> mInfoTextView.text = getString(R.string.result_tie)
-                        2 -> mInfoTextView.text = getString(R.string.result_human_wins)
-                        else -> mInfoTextView.text = getString(R.string.result_computer_wins)
-                    }
-                }
-            }
-        }
-
+        this.mBoardView.invalidate()
         this.mInfoTextView.text = getString(R.string.first_human)
 
     }
 
     private fun setMove(player: Char, location: Int) {
-        this.mGame.setMove(player, location)
-        this.mBoardButtons[location].isEnabled = false
-        this.mBoardButtons[location].text = player.toString()
-        if (player == TicTacToeGame.HUMAN_PLAYER)
-            this.mBoardButtons[location].setTextColor(Color.rgb(0, 200, 0))
-        else
-            this.mBoardButtons[location].setTextColor(Color.rgb(200, 0, 0))
+        mGame.setMove(player, location)
+        mBoardView.invalidate()
     }
 
     override fun onDifficultySelected(dialog: DialogFragment, id: Int) {
-        mGame.mDfficultyLevel = when(id) {
+        mGame.mDfficultyLevel = when (id) {
             0 -> TicTacToeGame.DifficultyLevel.Easy
             1 -> TicTacToeGame.DifficultyLevel.Hard
             2 -> TicTacToeGame.DifficultyLevel.Expert
@@ -130,6 +95,41 @@ class MainActivity : AppCompatActivity(),
         mDifficultyTextView.text = "Difficulty: ${mGame.mDfficultyLevel}"
         startNewGame()
         dialog.dismiss()
+    }
+
+    override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+        event?.let {
+            // Determine the cell that was touched
+            val col = it.x.toInt() / mBoardView.boardCellWidth
+            val row = it.y.toInt() / mBoardView.boardCellHeight
+            val pos = row * 3 + col
+
+            if (!mGameOver) {
+                setMove(TicTacToeGame.HUMAN_PLAYER, pos)
+
+                this.mGameOver = true
+                var winner = this.mGame.checkForWinner()
+                if (winner == 0) {
+                    mInfoTextView.text = getString(R.string.turn_computer)
+                    var move = this.mGame.getComputerMove()
+                    this.setMove(TicTacToeGame.COMPUTER_PLAYER, move)
+                    winner = this.mGame.checkForWinner()
+                }
+
+                when (winner) {
+                    0 -> {
+                        mInfoTextView.text = getString(R.string.turn_human)
+                        this.mGameOver = false
+                    }
+
+                    1 -> mInfoTextView.text = getString(R.string.result_tie)
+                    2 -> mInfoTextView.text = getString(R.string.result_human_wins)
+                    else -> mInfoTextView.text = getString(R.string.result_computer_wins)
+                }
+            }
+        }
+
+        return false
     }
 }
 
@@ -157,7 +157,7 @@ class SelectDifficultyDialogFragment : DialogFragment() {
             builder.setTitle("Select difficulty")
                 .setItems(
                     arrayOf("Easy", "Hard", "Expert")
-                ) { _, which -> listener.onDifficultySelected(this, which)}
+                ) { _, which -> listener.onDifficultySelected(this, which) }
 
             builder.create()
         } ?: throw IllegalStateException("Activity cannot be null")

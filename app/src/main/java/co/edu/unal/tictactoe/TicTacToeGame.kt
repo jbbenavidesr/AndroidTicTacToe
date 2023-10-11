@@ -20,10 +20,14 @@ class TicTacToeGame {
     private val mBoard = Array<Char>(9) { OPEN_SPOT }
 
     /** Clear the board of all X's and O's by setting all spots to OPEN_SPOT. */
-    public fun clearBoard() {
+    fun clearBoard() {
         for (i in mBoard.indices) {
             mBoard[i] = OPEN_SPOT
         }
+    }
+
+    fun getBoardOccupant(i: Int): Char {
+        return mBoard[i]
     }
 
     /** Set the given player at the given location on the game board.
@@ -182,5 +186,6 @@ class TicTacToeGame {
         mBoard[move] = COMPUTER_PLAYER
         return move
     }
+
 
 }
