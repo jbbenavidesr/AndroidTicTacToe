@@ -1,5 +1,8 @@
 package co.edu.unal.tictactoe
 
+import android.app.AlertDialog
+import android.app.Dialog
+import android.content.Context
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -8,18 +11,20 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.DialogFragment
 
-class MainActivity : AppCompatActivity() {
-
-    companion object {
-        const val DIALOG_DIFFICULTY_ID = 0
-        const val DIALOG_QUIT_ID = 1
-    }
+class MainActivity : AppCompatActivity(),
+    SelectDifficultyDialogFragment.SelectDifficultyDialogListener {
 
     private var mGameOver = false
     private val mGame = TicTacToeGame()
     private lateinit var mBoardButtons: List<Button>
     private lateinit var mInfoTextView: TextView
+    private lateinit var mDifficultyTextView: TextView
+    private lateinit var mToolbar: Toolbar
+
+    private var mSelectDifficultyDialog = SelectDifficultyDialogFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,8 +45,11 @@ class MainActivity : AppCompatActivity() {
         )
 
         this.mInfoTextView = findViewById<TextView>(R.id.information)
+        this.mDifficultyTextView = findViewById<TextView>(R.id.tv_difficulty)
+        this.mToolbar = findViewById<Toolbar>(R.id.my_toolbar)
+        setSupportActionBar(mToolbar)
 
-        this.startNewGame()
+        mSelectDifficultyDialog.show(supportFragmentManager, "difficulty_select")
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -53,15 +61,11 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when(item.itemId) {
             R.id.new_game -> {
-                startNewGame()
-                 true
-            }
-            R.id.ai_difficulty -> {
-                showDialog(DIALOG_DIFFICULTY_ID)
+                mSelectDifficultyDialog.show(supportFragmentManager, "difficulty_select")
                 true
             }
             R.id.quit -> {
-                showDialog(DIALOG_QUIT_ID)
+                finish()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -113,5 +117,50 @@ class MainActivity : AppCompatActivity() {
             this.mBoardButtons[location].setTextColor(Color.rgb(0, 200, 0))
         else
             this.mBoardButtons[location].setTextColor(Color.rgb(200, 0, 0))
+    }
+
+    override fun onDifficultySelected(dialog: DialogFragment, id: Int) {
+        mGame.mDfficultyLevel = when(id) {
+            0 -> TicTacToeGame.DifficultyLevel.Easy
+            1 -> TicTacToeGame.DifficultyLevel.Hard
+            2 -> TicTacToeGame.DifficultyLevel.Expert
+            else -> mGame.mDfficultyLevel
+        }
+
+        mDifficultyTextView.text = "Difficulty: ${mGame.mDfficultyLevel}"
+        startNewGame()
+        dialog.dismiss()
+    }
+}
+
+class SelectDifficultyDialogFragment : DialogFragment() {
+    private lateinit var listener: SelectDifficultyDialogListener
+
+    interface SelectDifficultyDialogListener {
+        fun onDifficultySelected(dialog: DialogFragment, id: Int)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        try {
+            listener = context as SelectDifficultyDialogListener
+        } catch (e: ClassCastException) {
+            throw ClassCastException("$context must implement SelectDifficultyDialogListener")
+        }
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return activity?.let {
+            val builder = AlertDialog.Builder(it)
+
+            builder.setTitle("Select difficulty")
+                .setItems(
+                    arrayOf("Easy", "Hard", "Expert")
+                ) { _, which -> listener.onDifficultySelected(this, which)}
+
+            builder.create()
+        } ?: throw IllegalStateException("Activity cannot be null")
+
     }
 }
