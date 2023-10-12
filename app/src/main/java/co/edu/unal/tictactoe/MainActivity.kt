@@ -194,6 +194,9 @@ class MainActivity : AppCompatActivity(),
         outState.putBoolean("mGameOver", mGameOver)
         outState.putCharSequence("info", mInfoTextView.text)
         outState.putSerializable("difficulty", mGame.mDifficultyLevel)
+        outState.putInt("mComputerWins", mComputerWins)
+        outState.putInt("mHumanWins", mHumanWins)
+        outState.putInt("mTies", mTies)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
@@ -202,6 +205,14 @@ class MainActivity : AppCompatActivity(),
         mInfoTextView.text = savedInstanceState.getCharSequence("info")
         mGame.mDifficultyLevel = savedInstanceState.getSerializable("difficulty") as TicTacToeGame.DifficultyLevel
         mDifficultyTextView.text = "Difficulty: ${mGame.mDifficultyLevel}"
+
+        mComputerWins = savedInstanceState.getInt("mComputerWins")
+        mHumanWins = savedInstanceState.getInt("mHumanWins")
+        mTies = savedInstanceState.getInt("mTies")
+
+        mHumanWinsTextView.text = "Human: $mHumanWins"
+        mComputerWinsTextView.text = "Computer: $mComputerWins"
+        mTiesTextView.text = "Ties: $mTies"
     }
 }
 
