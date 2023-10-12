@@ -3,6 +3,7 @@ package co.edu.unal.tictactoe
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
+import android.content.SharedPreferences
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -40,9 +41,17 @@ class MainActivity : AppCompatActivity(),
     private lateinit var mComputerWinsTextView: TextView
     private lateinit var mTiesTextView: TextView
 
+    private lateinit var mPrefs: SharedPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        mPrefs = getSharedPreferences("ttt_prefs", MODE_PRIVATE)
+
+        mHumanWins = mPrefs.getInt("mHumanWins", 0)
+        mComputerWins = mPrefs.getInt("mComputerWins", 0)
+        mTies = mPrefs.getInt("mTies", 0)
 
         this.mGame.clearBoard()
 
@@ -95,13 +104,29 @@ class MainActivity : AppCompatActivity(),
                 true
             }
 
-            R.id.quit -> {
-                finish()
+            R.id.reset_scores -> {
+                mComputerWins = 0
+                mHumanWins = 0
+                mTies = 0
+
+                mHumanWinsTextView.text = "Human: $mHumanWins"
+                mComputerWinsTextView.text = "Computer: $mComputerWins"
+                mTiesTextView.text = "Ties: $mTies"
                 true
             }
 
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        val ed = mPrefs.edit()
+        ed.putInt("mComputerWins", mComputerWins)
+        ed.putInt("mHumanWins", mHumanWins)
+        ed.putInt("mTies", mTies)
+        ed.commit()
     }
 
     private fun startNewGame() {
@@ -194,9 +219,6 @@ class MainActivity : AppCompatActivity(),
         outState.putBoolean("mGameOver", mGameOver)
         outState.putCharSequence("info", mInfoTextView.text)
         outState.putSerializable("difficulty", mGame.mDifficultyLevel)
-        outState.putInt("mComputerWins", mComputerWins)
-        outState.putInt("mHumanWins", mHumanWins)
-        outState.putInt("mTies", mTies)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
@@ -205,14 +227,6 @@ class MainActivity : AppCompatActivity(),
         mInfoTextView.text = savedInstanceState.getCharSequence("info")
         mGame.mDifficultyLevel = savedInstanceState.getSerializable("difficulty") as TicTacToeGame.DifficultyLevel
         mDifficultyTextView.text = "Difficulty: ${mGame.mDifficultyLevel}"
-
-        mComputerWins = savedInstanceState.getInt("mComputerWins")
-        mHumanWins = savedInstanceState.getInt("mHumanWins")
-        mTies = savedInstanceState.getInt("mTies")
-
-        mHumanWinsTextView.text = "Human: $mHumanWins"
-        mComputerWinsTextView.text = "Computer: $mComputerWins"
-        mTiesTextView.text = "Ties: $mTies"
     }
 }
 
