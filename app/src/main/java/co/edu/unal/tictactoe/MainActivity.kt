@@ -49,10 +49,6 @@ class MainActivity : AppCompatActivity(),
 
         if(savedInstanceState == null){
             mSelectDifficultyDialog.show(supportFragmentManager, "difficulty_select")
-        } else {
-            mGame.boardState = savedInstanceState.getCharArray("board")!!
-            mGameOver = savedInstanceState.getBoolean("mGameOver")
-            mInfoTextView.text = savedInstanceState.getCharSequence("info")
         }
     }
 
@@ -168,6 +164,15 @@ class MainActivity : AppCompatActivity(),
         outState.putCharArray("board", mGame.boardState)
         outState.putBoolean("mGameOver", mGameOver)
         outState.putCharSequence("info", mInfoTextView.text)
+        outState.putSerializable("difficulty", mGame.mDifficultyLevel)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        mGame.boardState = savedInstanceState.getCharArray("board")!!
+        mGameOver = savedInstanceState.getBoolean("mGameOver")
+        mInfoTextView.text = savedInstanceState.getCharSequence("info")
+        mGame.mDifficultyLevel = savedInstanceState.getSerializable("difficulty") as TicTacToeGame.DifficultyLevel
+        mDifficultyTextView.text = "Difficulty: ${mGame.mDifficultyLevel}"
     }
 }
 
