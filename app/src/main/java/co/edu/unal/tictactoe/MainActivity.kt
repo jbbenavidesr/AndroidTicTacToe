@@ -3,7 +3,7 @@ package co.edu.unal.tictactoe
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
-import android.graphics.Color
+import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
@@ -12,7 +12,6 @@ import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
-import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.DialogFragment
@@ -23,13 +22,15 @@ class MainActivity : AppCompatActivity(),
 
     private var mGameOver = false
     private val mGame = TicTacToeGame()
-    private lateinit var mBoardButtons: List<Button>
     private lateinit var mInfoTextView: TextView
     private lateinit var mDifficultyTextView: TextView
     private lateinit var mToolbar: Toolbar
     private lateinit var mBoardView: BoardView
 
     private var mSelectDifficultyDialog = SelectDifficultyDialogFragment()
+
+    private lateinit var mHumanMediaPlayer: MediaPlayer
+    private lateinit var mComputerMediaPlayer: MediaPlayer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +48,20 @@ class MainActivity : AppCompatActivity(),
         setSupportActionBar(mToolbar)
 
         mSelectDifficultyDialog.show(supportFragmentManager, "difficulty_select")
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        mHumanMediaPlayer = MediaPlayer.create(applicationContext, R.raw.human_turn)
+        mComputerMediaPlayer = MediaPlayer.create(applicationContext, R.raw.computer_turn)
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        mHumanMediaPlayer.release()
+        mComputerMediaPlayer.release()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -79,9 +94,18 @@ class MainActivity : AppCompatActivity(),
 
     }
 
-    private fun setMove(player: Char, location: Int) {
-        mGame.setMove(player, location)
-        mBoardView.invalidate()
+    private fun setMove(player: Char, location: Int): Boolean {
+        if (mGame.setMove(player, location)) {
+            if (player == TicTacToeGame.HUMAN_PLAYER) {
+                mHumanMediaPlayer.start()
+            } else {
+                mComputerMediaPlayer.start()
+            }
+
+            mBoardView.invalidate()
+            return true
+        }
+        return false
     }
 
     override fun onDifficultySelected(dialog: DialogFragment, id: Int) {
@@ -104,13 +128,13 @@ class MainActivity : AppCompatActivity(),
             val row = it.y.toInt() / mBoardView.boardCellHeight
             val pos = row * 3 + col
 
-            if (!mGameOver) {
-                setMove(TicTacToeGame.HUMAN_PLAYER, pos)
-
+            if (!this.mGameOver and setMove(TicTacToeGame.HUMAN_PLAYER, pos)) {
                 this.mGameOver = true
                 var winner = this.mGame.checkForWinner()
                 if (winner == 0) {
                     mInfoTextView.text = getString(R.string.turn_computer)
+
+
                     var move = this.mGame.getComputerMove()
                     this.setMove(TicTacToeGame.COMPUTER_PLAYER, move)
                     winner = this.mGame.checkForWinner()

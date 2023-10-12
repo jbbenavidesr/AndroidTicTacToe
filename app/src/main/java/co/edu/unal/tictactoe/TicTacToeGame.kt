@@ -36,8 +36,12 @@ class TicTacToeGame {
      * @param player - The HUMAN_PLAYER or COMPUTER_PLAYER
      * @param location - The location (0-8) to place the move
      */
-    public fun setMove(player: Char, location: Int) {
-        mBoard[location] = player
+    public fun setMove(player: Char, location: Int): Boolean {
+        if ((mBoard[location] == OPEN_SPOT) and (checkForWinner() == 0)) {
+            mBoard[location] = player
+            return true
+        }
+        return false
     }
 
     /**
@@ -117,7 +121,7 @@ class TicTacToeGame {
      *
      * @return The best move for the computer to make (0-8).
      */
-    public fun getComputerMove() : Int {
+    public fun getComputerMove(): Int {
         var move = -1
 
         when (this.mDfficultyLevel) {
@@ -128,6 +132,7 @@ class TicTacToeGame {
                     move = getRandomMove()
                 }
             }
+
             DifficultyLevel.Expert -> {
                 move = getWinningMove()
                 if (move == -1) {
@@ -175,13 +180,13 @@ class TicTacToeGame {
         return -1
     }
 
-    private fun getRandomMove() : Int {
+    private fun getRandomMove(): Int {
         var move = -1
 
         // Generate random move
         do {
             move = Random.nextInt(BOARD_SIZE)
-        } while(mBoard[move] == HUMAN_PLAYER || mBoard[move] == COMPUTER_PLAYER)
+        } while (mBoard[move] == HUMAN_PLAYER || mBoard[move] == COMPUTER_PLAYER)
 
         mBoard[move] = COMPUTER_PLAYER
         return move
