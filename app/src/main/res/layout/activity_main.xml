@@ -40,4 +40,34 @@
         android:gravity="center_horizontal"
         tools:text="info"
         android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/tv_human_wins"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:gravity="center_horizontal"
+        tools:text="Human: 0"
+        android:textSize="20sp" />
+
+
+    <TextView
+        android:id="@+id/tv_computer_wins"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:gravity="center_horizontal"
+        tools:text="Computer: 0"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/tv_ties"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:gravity="center_horizontal"
+        tools:text="Ties: 0"
+        android:textSize="20sp" />
+
+
 </LinearLayout>

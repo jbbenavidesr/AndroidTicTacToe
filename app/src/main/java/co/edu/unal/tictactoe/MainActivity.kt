@@ -32,6 +32,14 @@ class MainActivity : AppCompatActivity(),
     private lateinit var mHumanMediaPlayer: MediaPlayer
     private lateinit var mComputerMediaPlayer: MediaPlayer
 
+    private var mHumanWins = 0
+    private var mComputerWins = 0
+    private var mTies = 0
+
+    private lateinit var mHumanWinsTextView: TextView
+    private lateinit var mComputerWinsTextView: TextView
+    private lateinit var mTiesTextView: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -46,6 +54,14 @@ class MainActivity : AppCompatActivity(),
         this.mDifficultyTextView = findViewById<TextView>(R.id.tv_difficulty)
         this.mToolbar = findViewById<Toolbar>(R.id.my_toolbar)
         setSupportActionBar(mToolbar)
+
+        mHumanWinsTextView = findViewById<TextView>(R.id.tv_human_wins)
+        mComputerWinsTextView = findViewById<TextView>(R.id.tv_computer_wins)
+        mTiesTextView = findViewById<TextView>(R.id.tv_ties)
+
+        mHumanWinsTextView.text = "Human: $mHumanWins"
+        mComputerWinsTextView.text = "Computer: $mComputerWins"
+        mTiesTextView.text = "Ties: $mTies"
 
         if(savedInstanceState == null){
             mSelectDifficultyDialog.show(supportFragmentManager, "difficulty_select")
@@ -148,10 +164,23 @@ class MainActivity : AppCompatActivity(),
                         this.mGameOver = false
                     }
 
-                    1 -> mInfoTextView.text = getString(R.string.result_tie)
-                    2 -> mInfoTextView.text = getString(R.string.result_human_wins)
-                    else -> mInfoTextView.text = getString(R.string.result_computer_wins)
+                    1 -> {
+                        mInfoTextView.text = getString(R.string.result_tie)
+                        mTies++
+                    }
+                    2 -> {
+                        mInfoTextView.text = getString(R.string.result_human_wins)
+                        mHumanWins++
+                    }
+                    else -> {
+                        mInfoTextView.text = getString(R.string.result_computer_wins)
+                        mComputerWins++
+                    }
                 }
+
+                mHumanWinsTextView.text = "Human: $mHumanWins"
+                mComputerWinsTextView.text = "Computer: $mComputerWins"
+                mTiesTextView.text = "Ties: $mTies"
             }
         }
 
