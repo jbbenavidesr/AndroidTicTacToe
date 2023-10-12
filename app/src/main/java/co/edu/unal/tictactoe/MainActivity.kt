@@ -47,7 +47,13 @@ class MainActivity : AppCompatActivity(),
         this.mToolbar = findViewById<Toolbar>(R.id.my_toolbar)
         setSupportActionBar(mToolbar)
 
-        mSelectDifficultyDialog.show(supportFragmentManager, "difficulty_select")
+        if(savedInstanceState == null){
+            mSelectDifficultyDialog.show(supportFragmentManager, "difficulty_select")
+        } else {
+            mGame.boardState = savedInstanceState.getCharArray("board")!!
+            mGameOver = savedInstanceState.getBoolean("mGameOver")
+            mInfoTextView.text = savedInstanceState.getCharSequence("info")
+        }
     }
 
     override fun onResume() {
@@ -109,14 +115,14 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onDifficultySelected(dialog: DialogFragment, id: Int) {
-        mGame.mDfficultyLevel = when (id) {
+        mGame.mDifficultyLevel = when (id) {
             0 -> TicTacToeGame.DifficultyLevel.Easy
             1 -> TicTacToeGame.DifficultyLevel.Hard
             2 -> TicTacToeGame.DifficultyLevel.Expert
-            else -> mGame.mDfficultyLevel
+            else -> mGame.mDifficultyLevel
         }
 
-        mDifficultyTextView.text = "Difficulty: ${mGame.mDfficultyLevel}"
+        mDifficultyTextView.text = "Difficulty: ${mGame.mDifficultyLevel}"
         startNewGame()
         dialog.dismiss()
     }
@@ -155,6 +161,14 @@ class MainActivity : AppCompatActivity(),
 
         return false
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putCharArray("board", mGame.boardState)
+        outState.putBoolean("mGameOver", mGameOver)
+        outState.putCharSequence("info", mInfoTextView.text)
+    }
 }
 
 class SelectDifficultyDialogFragment : DialogFragment() {
@@ -185,6 +199,5 @@ class SelectDifficultyDialogFragment : DialogFragment() {
 
             builder.create()
         } ?: throw IllegalStateException("Activity cannot be null")
-
     }
 }

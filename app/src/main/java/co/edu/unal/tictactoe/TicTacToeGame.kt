@@ -15,9 +15,19 @@ class TicTacToeGame {
         Easy, Hard, Expert
     }
 
-    var mDfficultyLevel = DifficultyLevel.Expert
+    var mDifficultyLevel = DifficultyLevel.Expert
 
-    private val mBoard = Array<Char>(9) { OPEN_SPOT }
+    private val mBoard = CharArray(BOARD_SIZE) { OPEN_SPOT }
+
+    var boardState: CharArray
+        get() {
+            return mBoard
+        }
+        set(value) {
+            for (i in 0 until BOARD_SIZE) {
+                mBoard[i] = value[i]
+            }
+        }
 
     /** Clear the board of all X's and O's by setting all spots to OPEN_SPOT. */
     fun clearBoard() {
@@ -124,7 +134,7 @@ class TicTacToeGame {
     public fun getComputerMove(): Int {
         var move = -1
 
-        when (this.mDfficultyLevel) {
+        when (this.mDifficultyLevel) {
             DifficultyLevel.Easy -> move = getRandomMove()
             DifficultyLevel.Hard -> {
                 move = getWinningMove()
